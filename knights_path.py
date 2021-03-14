@@ -1,4 +1,8 @@
 import random
+import copy
+
+testing = True
+
 class ChessBoard:
     def __init__(self, size, row, column):
         self.board = [[False for i in range(size)] for j in range(size)]
@@ -25,22 +29,33 @@ class ChessBoard:
         self.currentSquare = (square[0],square[1])
         self.board[square[0]][square[1]] = True
 
+def warnsdorff(chessboard):
+    count = 1
+    while count < size * size:
+        if not chessboard.attacks(chessboard.currentSquare):
+            print(f'Warnsdorff failed with {size*size-count} novel squares remaining')
+            print(chessboard)
+            return f'Warnsdorff failed with {size*size-count} novel squares remaining'
+        if testing and count % 10 == 1 : print(chessboard)
+        current = chessboard.attacks(chessboard.currentSquare)[0]
+        for square in chessboard.attacks(chessboard.currentSquare):
+            if len(chessboard.attacks(square)) < len(chessboard.attacks(current)):
+                current = square
+        chessboard.moveKnight(current)
+        count += 1
+    print('Success...')
+    print(chessboard)
+    return 'Warnsdorff worked'
+def divideAndConquer(chessboard):
+    return 'hey'
+def thirdAlgorithm(chessboard):
+    return 'hi'
 
 size = int(input("Enter the size of the chess board: "))
-copy = chessboard = ChessBoard(size,random.randint(0,size-1),random.randint(0,size-1))
-count = 1
-
-while count < size * size:
-    if not chessboard.attacks(chessboard.currentSquare):
-        print(f'The algorithm failed with {size*size-count} novel squares remaining')
-        print(chessboard)
-        exit()
-    if count % 10 == 1 : print(chessboard)
-    current = chessboard.attacks(chessboard.currentSquare)[0]
-    for square in chessboard.attacks(chessboard.currentSquare):
-        if len(chessboard.attacks(square)) < len(chessboard.attacks(current)):
-            current = square
-    chessboard.moveKnight(current)
-    count += 1
-print('Success...')
-print(chessboard)
+board = ChessBoard(size,random.randint(0,size-1),random.randint(0,size-1))
+boards = [copy.deepcopy(board) for n in range(3)]
+results = []
+results.append(warnsdorff(boards[0]))
+results.append(divideAndConquer(boards[1]))
+results.append(thirdAlgorithm(boards[2]))
+print(results)
