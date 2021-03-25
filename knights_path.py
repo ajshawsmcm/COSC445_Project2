@@ -22,13 +22,13 @@ class ChessBoard:
         self.options_frame.grid(row=1, column=0)
 
         #Size of board to draw
-        self.size = 8
+        self.size = 10
         self.board_size_label = Label(self.options_frame, text="Board Size")
         self.board_size_label.grid(row = 1, column = 0, sticky = "E", pady = 2)
         self.size_input = Entry(self.options_frame)
         self.size_input.grid(row = 1, column = 1, sticky = "W", pady = 2)
         self.size_input.insert(0, str(self.size))
-
+    
         #Initial row, random starting location
         self.row = random.randint(0,self.size-1)
         self.knight_row_label = Label(self.options_frame, text="Row Location")
@@ -108,37 +108,80 @@ class ChessBoard:
         try:
             self.size = int(self.size_input.get())
         except :
-            self.size = 8;
+            self.size = 10;
             self.size_input.delete(0, 'end')
-            self.size_input.insert(0, "8")
+            self.size_input.insert(0, "10")
+            messagebox.showinfo(title=None, message="Illegal board size, changed to " + str(self.size) + ".")
         if self.size < 0:
-            self.size_input = abs(self.size)
+            self.size = abs(self.size)
             self.size_input.delete(0, 'end')
             self.size_input.insert(0, str(self.size))
+            messagebox.showinfo(title=None, message="Board size cannot be negative, changed to " + str(self.size) + ".")
+        if self.algorithm_option.get() == "Cull" and self.size % 5 != 0:
+            self.size = int(self.size/5) * 5
+            self.size_input.delete(0, 'end')
+            self.size_input.insert(0, str(self.size))
+            messagebox.showinfo(title=None, message=" For Cull's algorithm, size must be divisible by 5, changed board size to " + str(self.size) + ".")
+
 
         #Parse row entry
-        try:
-            self.row = int(self.row_input.get())
-        except :
-            self.row = random.randint(0, self.size-1);
-            self.row_input.delete(0, 'end')
-            self.row_input.insert(0, str(self.row))
-        if self.row < 0 or self.row >= self.size:
-            self.row = random.randint(0, self.size-1);
-            self.row_input.delete(0, 'end')
-            self.row_input.insert(0, str(self.row))
 
-        #Parse column entry
-        try:
-            self.column = int(self.column_input.get())
-        except :
-            self.column = random.randint(0, self.size-1)
-            self.column_input.delete(0, 'end')
-            self.column_input.insert(0, str(self.column))
-        if self.column < 0 or self.column >= self.size:
-            self.column = random.randint(0, self.size-1)
-            self.column_input.delete(0, 'end')
-            self.column_input.insert(0, str(self.column))
+        if self.algorithm_option.get() == "Cull":
+            try:
+                self.row = int(self.row_input.get())
+            except :
+                self.row = random.randint(0, self.size-1);
+                self.row_input.delete(0, 'end')
+                self.row_input.insert(0, str(self.row))
+                messagebox.showinfo(title=None, message=" Cull's algorithm starts on the lower left square, row updated to reflect that. " )
+            if self.row != self.size-1:
+                self.row = self.size-1;
+                self.row_input.delete(0, 'end')
+                self.row_input.insert(0, str(self.row))
+                messagebox.showinfo(title=None, message=" Cull's algorithm starts on the lower left square, row updated to reflect that. " )
+
+            #Parse column entry
+            try:
+                self.column = int(self.column_input.get())
+            except :
+                self.column = 0
+                self.column_input.delete(0, 'end')
+                self.column_input.insert(0, str(self.column))
+                messagebox.showinfo(title=None, message=" Cull's algorithm starts on the lower left square, column updated to reflect that." )
+            if self.column != 0:
+                self.column = 0
+                self.column_input.delete(0, 'end')
+                self.column_input.insert(0, str(self.column))
+                messagebox.showinfo(title=None, message=" Cull's algorithm starts on the lower left square, , column updated to reflect that." )
+        else:
+            try:
+                self.row = int(self.row_input.get())
+            except :
+                self.row = random.randint(0, self.size-1);
+                self.row_input.delete(0, 'end')
+                self.row_input.insert(0, str(self.row))
+                messagebox.showinfo(title=None, message=" Illegal row, changed to " + str(self.row) + ".")
+            if self.row < 0 or self.row >= self.size:
+                self.row = random.randint(0, self.size-1);
+                self.row_input.delete(0, 'end')
+                self.row_input.insert(0, str(self.row))
+                messagebox.showinfo(title=None, message=" Illegal row, changed to " + str(self.row) + ".")
+
+            #Parse column entry
+            try:
+                self.column = int(self.column_input.get())
+            except :
+                self.column = random.randint(0, self.size-1)
+                self.column_input.delete(0, 'end')
+                self.column_input.insert(0, str(self.column))
+                messagebox.showinfo(title=None, message=" Illegal column, changed to " + str(self.column) + ".")
+            if self.column < 0 or self.column >= self.size:
+                self.column = random.randint(0, self.size-1)
+                self.column_input.delete(0, 'end')
+                self.column_input.insert(0, str(self.column))
+                messagebox.showinfo(title=None, message=" Illegal column, changed to " + str(self.column) + ".")
+
+
         #Parse run speed
         try:
             self.run_speed = int(self.run_speed_input.get())
@@ -146,10 +189,13 @@ class ChessBoard:
             self.run_speed = 20;
             self.run_speed_input.delete(0, 'end')
             self.run_speed_input.insert(0, str(self.run_speed))
+            messagebox.showinfo(title=None, message=" Illegal run speed, changed to " + str(self.run_speed) + ".")
         if self.run_speed < 0:
             self.run_speed = 20;
             self.run_speed_input.delete(0, 'end')
             self.run_speed_input.insert(0, str(self.run_speed))
+            messagebox.showinfo(title=None, message=" Illegal run speed, changed to " + str(self.run_speed) + ".")
+            
         #Setup board
         self.board = [[False for i in range(self.size)] for j in range(self.size)]
         self.board[self.row][self.column] = True
@@ -284,12 +330,12 @@ def cull(size,chessboard):
                 horizonalOffset = j * 5
                 path.extend([(n[0] + vertOffset, size - 1 - (n[1] + horizonalOffset)) for n in baseOne])
             path.extend([(n[0] + vertOffset, size - 1 - (n[1] + size - 5))for n in baseTwo])
-    print(path)
+    # print(path)
     for square in path:
         if chessboard.stop:
             return
         chessboard.moveKnight(square)
-    return 'hey'
+    # return 'hey'
 
 baseOne = [(4,0),(2,1),(0,0),(1,2),(0,4),(2,3),(4,4),(3,2),(2,4),(4,3),(3,1),(1,0),(0,2),(1,4),
 (2,2),(0,3),(1,1),(3,0),(4,2),(3,4),(1,3),(0,1),(2,0),(4,1),(3,3)]
