@@ -68,9 +68,9 @@ class ChessBoard:
         self.draw_path_check.select()
         self.draw_path_check.grid(row=6, column=1, sticky="W", pady=2)
 
-        #Reset button
-        self.reset_button = Button(self.options_frame, text="Reset", command=self.restart)
-        self.reset_button.grid(row=7, column = 0, sticky = "E", pady=2)
+        # #Reset button
+        # self.reset_button = Button(self.options_frame, text="Reset", command=self.restart)
+        # self.reset_button.grid(row=7, column = 0, sticky = "E", pady=2)
 
         #Drawing canvas
         self.canvas = Canvas(master, width=751, height=751, bg="black", borderwidth=0, highlightthickness=0)
@@ -92,6 +92,7 @@ class ChessBoard:
         self.restart();
 
     def run(self):
+        self.restart()
         self.stop = False
         if self.algorithm_option.get() == "Warnsdorff":
             warnsdorff(self.size, self)
@@ -152,7 +153,7 @@ class ChessBoard:
                 self.column = 0
                 self.column_input.delete(0, 'end')
                 self.column_input.insert(0, str(self.column))
-                messagebox.showinfo(title=None, message=" Cull's algorithm starts on the lower left square, , column updated to reflect that." )
+                messagebox.showinfo(title=None, message=" Cull's algorithm starts on the lower left square, column updated to reflect that." )
         else:
             try:
                 self.row = int(self.row_input.get())
@@ -229,9 +230,12 @@ class ChessBoard:
         # print(self.row, self.column)
         self.knight = self.canvas.create_oval(self.column*square_size, self.row*square_size, (self.column + 1) * square_size, (self.row + 1) * square_size, fill="black")
         self.canvas.itemconfig(self.rectangles[self.row][self.column], fill="green")
-        self.canvas.create_text((self.column+1)*square_size-15, (self.row+1)*square_size-10, text="1", font=self.font)
+        if self.algorithm_option.get() != "Cull":
+            self.canvas.create_text((self.column+1)*square_size-15, (self.row+1)*square_size-10, text="1", font=self.font)
+            self.count = 2
+        else:
+            self.count = 1
         #Keep track of what square we are on and our last position to draw a line from.
-        self.count = 2;
         self.old = (self.row, self.column)
 
     def step(self, row, column):
