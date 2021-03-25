@@ -59,7 +59,7 @@ class ChessBoard:
         self.algorithm_option.set("Warnsdorff")
         self.algorithm_menu = OptionMenu(self.options_frame, self.algorithm_option, "Warnsdorff", "Cull")
         self.algorithm_menu.grid(row = 5, column = 1, sticky = "W", pady = 2)
-        
+
         #Draw path
         self.draw_path_label = Label(self.options_frame, text="Draw Path")
         self.draw_path_label.grid(row=6, column=0, sticky="E", pady=2)
@@ -67,7 +67,7 @@ class ChessBoard:
         self.draw_path_check = Checkbutton(self.options_frame, variable=self.draw_path_state)
         self.draw_path_check.select()
         self.draw_path_check.grid(row=6, column=1, sticky="W", pady=2)
-        
+
         #Reset button
         self.reset_button = Button(self.options_frame, text="Reset", command=self.restart)
         self.reset_button.grid(row=7, column = 0, sticky = "E", pady=2)
@@ -75,20 +75,20 @@ class ChessBoard:
         #Drawing canvas
         self.canvas = Canvas(master, width=751, height=751, bg="black", borderwidth=0, highlightthickness=0)
         self.canvas.grid(row=1, column=1, columnspan=5, rowspan=5, padx=8, pady=(0,8))
-        
+
         # #Play button
         self.play_button = Button(self.options_frame, text="Run", command=self.run)
         self.play_button.grid(row=7, column = 1, pady=2, sticky="W")
-        
+
         # #About button
         # self.reset_button = Button(self.options_frame, text="?", command=self.help)
         # self.reset_button.grid(row=10, column = 1, sticky = "W", pady=(50, 2))
 
-        #Setup our board with our initial parameters. 
+        #Setup our board with our initial parameters.
         self.board = [[False for i in range(self.size)] for j in range(self.size)]
         self.board[self.row][self.column] = True
         self.currentSquare = (self.row,self.column)
-        
+
         self.restart();
 
     def run(self):
@@ -96,9 +96,9 @@ class ChessBoard:
         if self.algorithm_option.get() == "Warnsdorff":
             warnsdorff(self.size, self)
         else:
-            pass
-        
-    
+            cull(self.size,self)
+
+
     def restart(self):
         self.stop = True
         #We get all the gui values and validate them.
@@ -156,7 +156,7 @@ class ChessBoard:
         self.currentSquare = (self.row,self.column)
         self.old = ()
         self.redraw()
-    
+
     def redraw(self):
         #Calculate the size of the squares.
         dimension = len(self.board)
@@ -184,28 +184,28 @@ class ChessBoard:
         self.knight = self.canvas.create_oval(self.column*square_size, self.row*square_size, (self.column + 1) * square_size, (self.row + 1) * square_size, fill="black")
         self.canvas.itemconfig(self.rectangles[self.row][self.column], fill="green")
         self.canvas.create_text((self.column+1)*square_size-15, (self.row+1)*square_size-10, text="1", font=self.font)
-        #Keep track of what square we are on and our last position to draw a line from.    
+        #Keep track of what square we are on and our last position to draw a line from.
         self.count = 2;
         self.old = (self.row, self.column)
-    
+
     def step(self, row, column):
         time.sleep(self.run_speed/1000)
-        
-        #Move the knight to the new coords. 
+
+        #Move the knight to the new coords.
         square_size = (750)/len(self.board)
         self.canvas.coords(self.knight, column*square_size, row*square_size, (column + 1) * square_size, (row + 1) * square_size)
         #Color the new square in green
 
         self.canvas.itemconfig(self.rectangles[row][column], fill="green")
-        
+
         #If in path draw mode, draw a line from the center of the old square, to the center of the new square.
         print(self.drawpath)
         if self.drawpath:
             self.canvas.create_line((self.old[1]*square_size)+(square_size/2), (self.old[0]*square_size)+(square_size/2), (column*square_size)+(square_size/2), (row*square_size)+(square_size/2))
-        
-        #Draw a number in the bottom left of the square for its visit order. 
+
+        #Draw a number in the bottom left of the square for its visit order.
         self.canvas.create_text((column+1)*square_size-15, (row+1)*square_size-10, text=str(self.count), font=self.font)
-        
+
         self.old = (row, column)
         self.count += 1
         self.master.update()
@@ -226,7 +226,7 @@ class ChessBoard:
         #Knights Location
         row = osquare[0]
         column = osquare[1]
-        
+
         #All 8 possible moves from any position on a chessboard.
         unfiltered = [(row+2,column+1),(row-2,column+1),(row-2,column-1),(row+2,column-1),(row+1,column+2),(row-1,column+2),(row-1,column-2),(row+1,column-2)]
 
@@ -238,7 +238,7 @@ class ChessBoard:
         self.currentSquare = (square[0],square[1])
         self.board[square[0]][square[1]] = True
         self.step(square[0], square[1])
-        
+
 
 #Warnsdorff's knights tour algorithm, uses a max unvisited neighbors to select our next move.
 #https://www.geeksforgeeks.org/warnsdorffs-algorithm-knights-tour-problem/
@@ -247,7 +247,7 @@ def warnsdorff(size, chessboard):
     while count < size * size:
         #Poison pill if gui user restarts mid run
         if chessboard.stop:
-            return;
+            return
 
         #If there are no traversable squares from our location, we have failed.
         if not chessboard.attacks(chessboard.currentSquare):
@@ -255,7 +255,7 @@ def warnsdorff(size, chessboard):
             # print(chessboard)
             return f'Warnsdorff failed with {size*size-count} novel squares remaining'
         if testing and count % 10 == 1 : print(chessboard)
-        #We select the unvisited traversable square with the lowest number of unvisited adjacent squares. 
+        #We select the unvisited traversable square with the lowest number of unvisited adjacent squares.
         current = chessboard.attacks(chessboard.currentSquare)[0]
         for square in chessboard.attacks(chessboard.currentSquare):
             if len(chessboard.attacks(square)) < len(chessboard.attacks(current)):
@@ -263,19 +263,40 @@ def warnsdorff(size, chessboard):
         #We move to that best square
         chessboard.moveKnight(current)
         count += 1
-    #If we make it to the end of the loop, we have successfully mapped a knights tour. 
+    #If we make it to the end of the loop, we have successfully mapped a knights tour.
     # print('Success...')
     # print(chessboard)
     # return 'Warnsdorff worked'
 
-def divideAndConquer(chessboard):
-    return 'hey'
-def thirdAlgorithm(chessboard):
-    return 'hi'
+def cull(size,chessboard):
 
+    path = []
+    for i in range(size // 5):
+        if i % 2 == 0:
+            vertOffset = size - (5 * (i + 1))
+            for j in range(size // 5 - 1):
+                horizonalOffset = j * 5
+                path.extend([(n[0] + vertOffset,n[1] + horizonalOffset) for n in baseOne])
+            path.extend([(n[0] + vertOffset,n[1] + size - 5)for n in baseTwo])
+        else:
+            vertOffset = size - (5 * (i + 1))
+            for j in range(size // 5 - 1):
+                horizonalOffset = j * 5
+                path.extend([(n[0] + vertOffset, size - 1 - (n[1] + horizonalOffset)) for n in baseOne])
+            path.extend([(n[0] + vertOffset, size - 1 - (n[1] + size - 5))for n in baseTwo])
+    print(path)
+    for square in path:
+        if chessboard.stop:
+            return
+        chessboard.moveKnight(square)
+    return 'hey'
+
+baseOne = [(4,0),(2,1),(0,0),(1,2),(0,4),(2,3),(4,4),(3,2),(2,4),(4,3),(3,1),(1,0),(0,2),(1,4),
+(2,2),(0,3),(1,1),(3,0),(4,2),(3,4),(1,3),(0,1),(2,0),(4,1),(3,3)]
+baseTwo = [(4,0),(3,2),(4,4),(2,3),(0,4),(1,2),(0,0),(2,1),(3,3),(4,1),(2,0),(0,1),(2,2),(1,4),
+(0,2),(1,0),(3,1),(4,3),(2,4),(0,3),(1,1),(3,0),(4,2),(3,4),(1,3)]
 root = Tk()
-#places the window at the top left corner. 
+#places the window at the top left corner.
 root.geometry("+0+0")
 my_gui = ChessBoard(root)
 root.mainloop()
-
