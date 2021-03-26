@@ -1,13 +1,15 @@
+#Thomas Walker, Adam Shaw, Elise Evans, Mason Humphrey
+#Knights Path GUI
+#3/25/2021
+#Design/Analysis Project 2
+#This class draws a gui to visualize two knights tour algorithms on a board.
+
 import random, copy, time
 from tkinter import Tk, Label, Button, Canvas, Entry, Checkbutton, Frame, IntVar, messagebox, OptionMenu, StringVar
 import tkinter.font as f
 
 
-testing = True
-
 class ChessBoard:
-    #Constructor with size and starting row/column.
-    #We represent squares in this class as tuples with row, column
     def __init__(self, master):
         #Setup GUI
         self.master = master
@@ -249,7 +251,7 @@ class ChessBoard:
         self.canvas.itemconfig(self.rectangles[row][column], fill="green")
 
         #If in path draw mode, draw a line from the center of the old square, to the center of the new square.
-        print(self.drawpath)
+        # print(self.drawpath)
         if self.drawpath:
             self.canvas.create_line((self.old[1]*square_size)+(square_size/2), (self.old[0]*square_size)+(square_size/2), (column*square_size)+(square_size/2), (row*square_size)+(square_size/2))
 
@@ -304,7 +306,7 @@ def warnsdorff(size, chessboard):
             # print(f'Warnsdorff failed with {size*size-count} novel squares remaining')
             # print(chessboard)
             return f'Warnsdorff failed with {size*size-count} novel squares remaining'
-        if testing and count % 10 == 1 : print(chessboard)
+        # if testing and count % 10 == 1 : print(chessboard)
         #We select the unvisited traversable square with the lowest number of unvisited adjacent squares.
         current = chessboard.attacks(chessboard.currentSquare)[0]
         for square in chessboard.attacks(chessboard.currentSquare):
@@ -319,7 +321,6 @@ def warnsdorff(size, chessboard):
     # return 'Warnsdorff worked'
 
 def cull(size,chessboard):
-
     path = []
     for i in range(size // 5):
         if i % 2 == 0:
@@ -339,7 +340,7 @@ def cull(size,chessboard):
         if chessboard.stop:
             return
         chessboard.moveKnight(square)
-    # return 'hey'
+    return 'hey'
 
 baseOne = [(4,0),(2,1),(0,0),(1,2),(0,4),(2,3),(4,4),(3,2),(2,4),(4,3),(3,1),(1,0),(0,2),(1,4),
 (2,2),(0,3),(1,1),(3,0),(4,2),(3,4),(1,3),(0,1),(2,0),(4,1),(3,3)]
